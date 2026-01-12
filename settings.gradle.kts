@@ -22,3 +22,8 @@ pluginManagement {
     }
 }
 include("hw-jpql21")
+include("hw-caches22")
+include("hw-caches22:demo")
+findProject(":hw-caches22:demo")?.name = "demo"
+include("hw-caches22:homework")
+findProject(":hw-caches22:homework")?.name = "homework"
