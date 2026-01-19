@@ -29,22 +29,55 @@ public class DbServiceDemo {
         ///
         var dbServiceClient = new DbServiceClientImpl(transactionRunner, clientTemplate);
 
-        // Тест сохранения
+        // Тест сохранения клиента 1
         long startSave = System.currentTimeMillis();
-        dbServiceClient.saveClient(new Client("dbServiceFirst"));
+        Client clientFirst = dbServiceClient.saveClient(new Client("dbServiceFirst"));
         long endSave = System.currentTimeMillis();
-        System.out.println("SaveClient: " + (endSave - startSave) + " ms");
+        System.out.println("SaveClientFirst: " + (endSave - startSave) + " ms");
+        // Тест получения клиента 1 из кэша
+        long startReadClientFirst = System.currentTimeMillis();
+        var clientFirstSelected = dbServiceClient
+                .getClient(clientFirst.getId())
+                .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientFirst.getId()));
+        long endReadClientFirst = System.currentTimeMillis();
+        System.out.println("ReadClientFirst: " + (endReadClientFirst - startReadClientFirst) + " ms");
+        log.info("clientFirstSelected:{}", clientFirstSelected);
+        // Тест получения клиента 1 без кэша
+        dbServiceClient.removeClientFromCache(clientFirst);
+        startReadClientFirst = System.currentTimeMillis();
+        clientFirstSelected = dbServiceClient
+                .getClient(clientFirst.getId())
+                .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientFirst.getId()));
+        endReadClientFirst = System.currentTimeMillis();
+        System.out.println("ReadClientFirst: " + (endReadClientFirst - startReadClientFirst) + " ms");
+        log.info("clientFirstSelected:{}", clientFirstSelected);
+        // Тест получения клиента 1 из кэша
+        startReadClientFirst = System.currentTimeMillis();
+        clientFirstSelected = dbServiceClient
+                .getClient(clientFirst.getId())
+                .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientFirst.getId()));
+        endReadClientFirst = System.currentTimeMillis();
+        System.out.println("ReadClientFirst: " + (endReadClientFirst - startReadClientFirst) + " ms");
+        log.info("clientFirstSelected:{}", clientFirstSelected);
 
+        // Тест получения
         var clientSecond = dbServiceClient.saveClient(new Client("dbServiceSecond"));
-
         long startRead = System.currentTimeMillis();
         var clientSecondSelected = dbServiceClient
                 .getClient(clientSecond.getId())
                 .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientSecond.getId()));
         long endRead = System.currentTimeMillis();
         System.out.println("ReadClient: " + (endRead - startRead) + " ms");
-
         log.info("clientSecondSelected:{}", clientSecondSelected);
+        ///
+        // Тест получения 2
+        long startRead2 = System.currentTimeMillis();
+        var clientSecondSelected2 = dbServiceClient
+                .getClient(clientSecond.getId())
+                .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientSecond.getId()));
+        long endRead2 = System.currentTimeMillis();
+        System.out.println("ReadClient2: " + (endRead2 - startRead2) + " ms");
+        log.info("clientSecondSelected2:{}", clientSecondSelected2);
         ///
 
         long startUpdate = System.currentTimeMillis();
