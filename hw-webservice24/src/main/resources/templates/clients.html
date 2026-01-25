@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Управление клиентами</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"], textarea {
+            padding: 8px 12px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        textarea {
+            width: 300px;
+            height: 60px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .btn-secondary {
+            background-color: #2196F3;
+        }
+
+        .btn-secondary:hover {
+            background-color: #0b7dda;
+        }
+
+        .btn-danger {
+            background-color: #f44336;
+        }
+
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .error {
+            color: #d32f2f;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .success {
+            color: #388e3c;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .loading {
+            color: #1976d2;
+        }
+
+        .clients-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .clients-table th, .clients-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .clients-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .clients-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .clients-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .empty-list {
+            color: #888;
+            font-style: italic;
+            padding: 10px;
+        }
+
+        .client-count {
+            margin: 10px 0;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .client-info {
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background-color: white;
+        }
+
+        .client-info ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+
+        .client-info li {
+            margin: 3px 0;
+        }
+
+        .form-group {
+            margin: 10px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .phone-inputs {
+            margin: 10px 0;
+        }
+
+        .phone-input {
+            display: flex;
+            margin: 5px 0;
+        }
+
+        .phone-input input {
+            flex: 1;
+        }
+
+        .phone-input button {
+            margin-left: 5px;
+            padding: 4px 8px;
+            background-color: #ff9800;
+        }
+
+        .phone-input button:hover {
+            background-color: #f57c00;
+        }
+    </style>
+</head>
+
+<body>
+<h1>Управление клиентами</h1>
+
+
+<div class="section">
+    <h2>Добавить нового клиента</h2>
+    <div id="addClientForm">
+        <div class="form-group">
+            <label for="clientName">Имя клиента *</label>
+            <input type="text" id="clientName" placeholder="Введите имя">
+        </div>
+
+        <div class="form-group">
+            <label for="clientAddress">Адрес</label>
+            <textarea id="clientAddress" placeholder="Введите адрес (необязательно)"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Телефоны</label>
+            <div id="phoneInputsContainer" class="phone-inputs">
+                <div class="phone-input">
+                    <input type="text" class="phone-number" placeholder="Номер телефона">
+                    <button type="button" class="remove-phone-btn" style="display: none;">✕</button>
+                </div>
+            </div>
+            <button type="button" class="btn-secondary" onclick="addPhoneField()">+ Добавить телефон</button>
+        </div>
+
+        <div>
+            <button onclick="addClient()">Добавить клиента</button>
+            <button onclick="clearAddForm()" class="btn-danger">Очистить форму</button>
+        </div>
+    </div>
+    <div id="addClientResult"></div>
+</div>
+
+
+<div class="section">
+    <h2>Поиск клиента по ID</h2>
+    <div>
+        <input type="text" id="clientIdTextBox" value="1" placeholder="Введите id клиента">
+        <button onclick="getClientById()">Найти клиента</button>
+    </div>
+    <div id="singleClientContainer" class="client-info">
+
+    </div>
+</div>
+
+
+<div class="section">
+    <h2>Список всех клиентов</h2>
+    <div>
+        <button onclick="getAllClients()" id="getAllBtn">Показать всех клиентов</button>
+        <button onclick="clearAllClients()" id="clearAllBtn" class="btn-danger">Очистить список</button>
+    </div>
+    <div class="client-count" id="clientCount"></div>
+    <div id="allClientsContainer">
+
+    </div>
+</div>
+
+<script>
+
+    let phoneCounter = 1;
+
+    function addPhoneField() {
+        const container = document.getElementById('phoneInputsContainer');
+        const div = document.createElement('div');
+        div.className = 'phone-input';
+        div.innerHTML = `
+            <input type="text" class="phone-number" placeholder="Номер телефона">
+            <button type="button" class="remove-phone-btn" onclick="removePhoneField(this)">✕</button>
+        `;
+        container.appendChild(div);
+
+
+        if (phoneCounter === 1) {
+            document.querySelector('.remove-phone-btn').style.display = 'block';
+        }
+        phoneCounter++;
+    }
+
+    function removePhoneField(button) {
+        const container = document.getElementById('phoneInputsContainer');
+        if (container.children.length > 1) {
+            button.parentElement.remove();
+        }
+        phoneCounter--;
+
+        if (container.children.length === 1) {
+            container.querySelector('.remove-phone-btn').style.display = 'none';
+        }
+    }
+
+    function addClient() {
+        const name = document.getElementById('clientName').value.trim();
+        const address = document.getElementById('clientAddress').value.trim();
+        const phoneInputs = document.querySelectorAll('.phone-number');
+
+        if (!name) {
+            showResult('error', 'Пожалуйста, введите имя клиента');
+            return;
+        }
+
+        const phones = [];
+        phoneInputs.forEach(input => {
+            const phone = input.value.trim();
+            if (phone) {
+                phones.push({ number: phone });
+            }
+        });
+
+        const clientData = {
+            name: name
+        };
+
+        if (address) {
+            clientData.address = { street: address };
+        }
+
+        if (phones.length > 0) {
+            clientData.phones = phones;
+        }
+
+        const resultDiv = document.getElementById('addClientResult');
+        resultDiv.innerHTML = '<div class="loading">Добавление клиента...</div>';
+
+        fetch('/api/client', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(clientData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка сервера: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(savedClient => {
+                showResult('success', `Клиент "${savedClient.name}" успешно добавлен! ID: ${savedClient.id}`);
+                clearAddForm();
+
+                if (document.getElementById('allClientsContainer').innerHTML) {
+                    getAllClients();
+                }
+            })
+            .catch(error => {
+                showResult('error', 'Ошибка: ' + error.message);
+            });
+    }
+
+    function clearAddForm() {
+        document.getElementById('clientName').value = '';
+        document.getElementById('clientAddress').value = '';
+
+        const container = document.getElementById('phoneInputsContainer');
+        while (container.children.length > 1) {
+            container.lastChild.remove();
+        }
+        container.querySelector('.phone-number').value = '';
+        container.querySelector('.remove-phone-btn').style.display = 'none';
+        phoneCounter = 1;
+    }
+
+    function showResult(type, message) {
+        const resultDiv = document.getElementById('addClientResult');
+        resultDiv.innerHTML = `<div class="${type}">${message}</div>`;
+    }
+
+    function getClientById() {
+        const clientIdTextBox = document.getElementById('clientIdTextBox');
+        const clientDataContainer = document.getElementById('singleClientContainer');
+        const id = clientIdTextBox.value.trim();
+
+        if (!id) {
+            clientDataContainer.innerHTML = '<div class="error">Пожалуйста, введите ID клиента</div>';
+            return;
+        }
+
+        clientDataContainer.innerHTML = '<div class="loading">Загрузка клиента...</div>';
+
+        fetch('/api/client/' + id)
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Клиент с таким ID не найден');
+                    }
+                    throw new Error('Ошибка сервера: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(client => {
+                if (!client) {
+                    clientDataContainer.innerHTML = '<div class="error">Клиент не найден</div>';
+                    return;
+                }
+
+                let html = '<h3>Информация о клиенте</h3>';
+                html += '<p><strong>ID:</strong> ' + client.id + '</p>';
+                html += '<p><strong>Имя:</strong> ' + client.name + '</p>';
+
+                if (client.address && client.address.street) {
+                    html += '<p><strong>Адрес:</strong> ' + client.address.street + '</p>';
+                } else if (client.address && typeof client.address === 'string') {
+                    html += '<p><strong>Адрес:</strong> ' + client.address + '</p>';
+                } else {
+                    html += '<p><strong>Адрес:</strong> Не указан</p>';
+                }
+
+                if (client.phones && client.phones.length > 0) {
+                    html += '<p><strong>Телефоны:</strong></p><ul>';
+                    client.phones.forEach(phone => {
+                        if (phone && phone.number) {
+                            html += '<li>' + phone.number + '</li>';
+                        } else if (phone && typeof phone === 'string') {
+                            html += '<li>' + phone + '</li>';
+                        }
+                    });
+                    html += '</ul>';
+                } else {
+                    html += '<p><strong>Телефоны:</strong> Нет телефонов</p>';
+                }
+
+                clientDataContainer.innerHTML = html;
+            })
+            .catch(error => {
+                clientDataContainer.innerHTML = '<div class="error">Ошибка: ' + error.message + '</div>';
+            });
+    }
+
+    function getAllClients() {
+        const allClientsContainer = document.getElementById('allClientsContainer');
+        const clientCount = document.getElementById('clientCount');
+        const getAllBtn = document.getElementById('getAllBtn');
+
+        allClientsContainer.innerHTML = '<div class="loading">Загрузка списка клиентов...</div>';
+        getAllBtn.disabled = true;
+        getAllBtn.textContent = 'Загрузка...';
+
+        fetch('/api/clients')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка сервера: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(clients => {
+                if (!clients || clients.length === 0) {
+                    allClientsContainer.innerHTML = '<div class="empty-list">Список клиентов пуст</div>';
+                    clientCount.innerHTML = 'Найдено клиентов: 0';
+                    return;
+                }
+
+                let html = '<table class="clients-table">';
+                html += '<thead><tr>' +
+                    '<th>ID</th>' +
+                    '<th>Имя</th>' +
+                    '<th>Адрес</th>' +
+                    '<th>Телефоны</th>' +
+                    '</tr></thead><tbody>';
+
+                clients.forEach(client => {
+                    html += '<tr>';
+                    html += '<td>' + client.id + '</td>';
+                    html += '<td>' + client.name + '</td>';
+
+                    if (client.address && client.address.street) {
+                        html += '<td>' + client.address.street + '</td>';
+                    } else if (client.address && typeof client.address === 'string') {
+                        html += '<td>' + client.address + '</td>';
+                    } else {
+                        html += '<td>Не указан</td>';
+                    }
+
+                    if (client.phones && client.phones.length > 0) {
+                        html += '<td><ul>';
+                        client.phones.forEach(phone => {
+                            if (phone && phone.number) {
+                                html += '<li>' + phone.number + '</li>';
+                            } else if (phone && typeof phone === 'string') {
+                                html += '<li>' + phone + '</li>';
+                            } else if (phone) {
+                                html += '<li>' + JSON.stringify(phone) + '</li>';
+                            }
+                        });
+                        html += '</ul></td>';
+                    } else {
+                        html += '<td>Нет телефонов</td>';
+                    }
+
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table>';
+                allClientsContainer.innerHTML = html;
+                clientCount.innerHTML = 'Найдено клиентов: ' + clients.length;
+            })
+            .catch(error => {
+                allClientsContainer.innerHTML = '<div class="error">Ошибка: ' + error.message + '</div>';
+                clientCount.innerHTML = '';
+            })
+            .finally(() => {
+                getAllBtn.disabled = false;
+                getAllBtn.textContent = 'Показать всех клиентов';
+            });
+    }
+
+    function clearAllClients() {
+        document.getElementById('allClientsContainer').innerHTML = '';
+        document.getElementById('clientCount').innerHTML = '';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const input = document.getElementById('clientIdTextBox');
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                getClientById();
+            }
+        });
+
+        getClientById();
+
+        getAllClients();
+    });
+</script>
+</body>
+</html>

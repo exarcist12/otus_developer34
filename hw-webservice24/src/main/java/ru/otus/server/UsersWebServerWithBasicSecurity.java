@@ -2,7 +2,6 @@ package ru.otus.server;
 
 import com.google.gson.Gson;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.security.ConstraintMapping;
@@ -69,12 +68,11 @@ public class UsersWebServerWithBasicSecurity extends UsersWebServerSimple {
         Constraint constraintPost = Constraint.from(ROLE_NAME_ADMIN);
         for (String path : paths) {
 
-                ConstraintMapping mapping = new ConstraintMapping();
-                mapping.setPathSpec(path);
-                mapping.setMethod("POST");
-                mapping.setConstraint(constraintPost);
-                constraintMappings.add(mapping);
-
+            ConstraintMapping mapping = new ConstraintMapping();
+            mapping.setPathSpec(path);
+            mapping.setMethod("POST");
+            mapping.setConstraint(constraintPost);
+            constraintMappings.add(mapping);
         }
 
         ConstraintSecurityHandler security = new ConstraintSecurityHandler();
