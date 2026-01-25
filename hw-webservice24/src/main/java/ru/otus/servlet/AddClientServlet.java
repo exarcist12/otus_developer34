@@ -32,7 +32,6 @@ public class AddClientServlet extends HttpServlet {
 
             Client client = gson.fromJson(jsonBody, Client.class);
 
-
             if (client.getName() == null || client.getName().trim().isEmpty()) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().println("{\"error\":\"Client name is required\"}");
