@@ -29,28 +29,7 @@ public class UsersWebServerWithBasicSecurity extends UsersWebServerSimple {
         this.loginService = loginService;
     }
 
-    //    @Override
-    //    protected Handler applySecurity(ServletContextHandler servletContextHandler, String... paths) {
-    //        Constraint constraint = Constraint.from(ROLE_NAME_USER, ROLE_NAME_ADMIN);
-    //
-    //        List<ConstraintMapping> constraintMappings = new ArrayList<>();
-    //        Arrays.stream(paths).forEachOrdered(path -> {
-    //            ConstraintMapping mapping = new ConstraintMapping();
-    //            mapping.setPathSpec(path);
-    //            mapping.setConstraint(constraint);
-    //            constraintMappings.add(mapping);
-    //        });
-    //
-    //        ConstraintSecurityHandler security = new ConstraintSecurityHandler();
-    //        // как декодировать стороку с юзером:паролем https://www.base64decode.org/
-    //        security.setAuthenticator(new BasicAuthenticator());
-    //
-    //        security.setLoginService(loginService);
-    //        security.setConstraintMappings(constraintMappings);
-    //        security.setHandler(new Handler.Wrapper(servletContextHandler));
-    //
-    //        return security;
-    //    }
+
 
     @Override
     protected Handler applySecurity(ServletContextHandler servletContextHandler, String... paths) {
