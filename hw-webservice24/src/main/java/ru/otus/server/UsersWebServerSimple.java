@@ -10,6 +10,7 @@ import ru.otus.crm.service.DBServiceClient;
 import ru.otus.helpers.FileSystemHelper;
 import ru.otus.services.TemplateProcessor;
 import ru.otus.servlet.AddClientServlet;
+import ru.otus.servlet.StaticFileServlet;
 import ru.otus.servlet.UserApiServlet;
 import ru.otus.servlet.UsersApiServlet;
 
@@ -76,11 +77,12 @@ public class UsersWebServerSimple implements UsersWebServer {
 
     private ServletContextHandler createServletContextHandler() {
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+
         servletContextHandler.addServlet(
                 new ServletHolder(new UsersApiServlet(templateProcessor, dbServiceClient, gson)), "/api/clients");
         servletContextHandler.addServlet(new ServletHolder(new UserApiServlet(dbServiceClient, gson)), "/api/client/*");
         servletContextHandler.addServlet(new ServletHolder(new AddClientServlet(dbServiceClient, gson)), "/api/client");
-
+        servletContextHandler.addServlet(new ServletHolder(new StaticFileServlet()), "/static/*");
         return servletContextHandler;
     }
 }
