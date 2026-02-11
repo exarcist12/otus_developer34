@@ -4,7 +4,7 @@ dependencies {
 
     implementation("ch.qos.logback:logback-classic")
     implementation("org.hibernate.orm:hibernate-core")
-    implementation("org.flywaydb:flyway-core:8.5.13")
+//    implementation("org.flywaydb:flyway-core:8.5.13")
     implementation("org.postgresql:postgresql")
 
     testImplementation("com.h2database:h2")
@@ -27,5 +27,14 @@ dependencies {
     implementation("org.eclipse.jetty:jetty-io")
     implementation("org.eclipse.jetty:jetty-util")
     implementation("org.freemarker:freemarker")
+    implementation("ch.qos.logback:logback-classic")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.postgresql:postgresql")
+//    implementation("com.google.code.findbugs:jsr305")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
 }
