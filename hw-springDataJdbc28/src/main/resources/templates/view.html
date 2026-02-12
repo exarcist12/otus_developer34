@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Просмотр клиента</title>
+</head>
+<body>
+<h1>Карточка клиента</h1>
+
+<div th:if="${client == null}">
+    <p style="color: red;">Клиент не найден!</p>
+    <a href="/clients">← Назад</a>
+</div>
+
+<div th:if="${client != null}">
+    <p><strong>ID:</strong> <span th:text="${client.id}">1</span></p>
+    <p><strong>Имя:</strong> <span th:text="${client.name}">Иван</span></p>
+    <p><strong>Адрес:</strong>
+        <span th:if="${client.address != null}"
+              th:text="${client.address.street}">ул. Ленина</span>
+        <span th:unless="${client.address != null}">не указан</span>
+    </p>
+
+    <p><strong>Телефоны:</strong></p>
+    <ul>
+        <li th:each="phone : ${client.phones}"
+            th:text="${phone.number}">123-45-67</li>
+        <li th:if="${#lists.isEmpty(client.phones)}">нет телефонов</li>
+    </ul>
+
+    <hr>
+    <a href="/clients">← К списку клиентов</a>
+</div>
+</body>
+</html>

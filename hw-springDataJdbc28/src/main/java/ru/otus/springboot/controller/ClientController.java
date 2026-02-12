@@ -2,8 +2,8 @@ package ru.otus.springboot.controller;
 
 import java.util.List;
 import org.springframework.web.bind.annotation.*;
-import ru.otus.springboot.crm.model.Client;
-import ru.otus.springboot.crm.service.ClientService;
+import ru.otus.springboot.model.Client;
+import ru.otus.springboot.service.ClientService;
 
 @RestController
 @RequestMapping("/api/clients")

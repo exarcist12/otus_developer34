@@ -1,7 +1,8 @@
-package ru.otus.springboot.crm.model;
+package ru.otus.springboot.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.HashSet;
 import java.util.Set;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -26,7 +27,7 @@ public class Client {
     private Address address;
 
     @MappedCollection(idColumn = "client_id")
-    private Set<Phone> phones;
+    private Set<Phone> phones = new HashSet<>();
 
     public Client() {}
 

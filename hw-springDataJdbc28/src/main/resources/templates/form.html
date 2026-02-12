@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Новый клиент</title>
+</head>
+<body>
+<h1>Добавление клиента</h1>
+
+<form action="/clients" method="post">
+    <!-- Имя -->
+    <p>
+        <label>Имя:</label><br>
+        <input type="text" name="name" required>
+    </p>
+
+    <!-- Адрес -->
+    <p>
+        <label>Адрес:</label><br>
+        <input type="text" name="street">
+    </p>
+
+    <!-- Телефоны -->
+    <p>
+        <label>Телефоны:</label><br>
+    <div id="phones">
+        <input type="text" name="phones" placeholder="Номер телефона">
+    </div>
+    <button type="button" onclick="addPhone()">➕</button>
+    </p>
+
+    <p>
+        <button type="submit">Сохранить</button>
+        <a href="/clients">Отмена</a>
+    </p>
+</form>
+
+<script>
+    function addPhone() {
+        const div = document.getElementById('phones');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'phones';
+        input.placeholder = 'Номер телефона';
+        div.appendChild(document.createElement('br'));
+        div.appendChild(input);
+    }
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
-package ru.otus.springboot.crm.repository;
+package ru.otus.springboot.repository;
 
 import org.springframework.data.repository.ListCrudRepository;
-import ru.otus.springboot.crm.model.Phone;
+import ru.otus.springboot.model.Phone;
 
 public interface PhoneRepository extends ListCrudRepository<Phone, Long> {}

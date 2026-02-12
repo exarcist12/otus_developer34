@@ -1,14 +1,14 @@
-package ru.otus.springboot.crm.service;
+package ru.otus.springboot.service;
 
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
-import ru.otus.springboot.crm.model.Address;
-import ru.otus.springboot.crm.model.Client;
-import ru.otus.springboot.crm.model.Phone;
-import ru.otus.springboot.crm.repository.AddressRepository;
-import ru.otus.springboot.crm.repository.ClientRepository;
+import ru.otus.springboot.model.Address;
+import ru.otus.springboot.model.Client;
+import ru.otus.springboot.model.Phone;
+import ru.otus.springboot.repository.AddressRepository;
+import ru.otus.springboot.repository.ClientRepository;
 
 @Service
 @Transactional
@@ -28,6 +28,56 @@ public class ClientServiceImpl implements ClientService {
         Client saveClient = clientRepository.save(client);
 
         return saveClient;
+    }
+
+    public Client saveClientWithStreet(String name, String street) {
+        Address address = new Address();
+        address.setStreet(street);
+        Address savedAddress = addressRepository.save(address);
+
+        Client client = new Client();
+        client.setName(name);
+        client.setAddressId(savedAddress.getId());
+        Client savedClient = clientRepository.save(client);
+
+        savedClient.setAddress(savedAddress);
+
+        return savedClient;
+    }
+
+    public Client saveClientWithAddressAndPhones(String name, String street, List<String> phoneNumbers) {
+
+        Address savedAddress = null;
+        if (street != null && !street.isEmpty()) {
+            Address address = new Address();
+            address.setStreet(street);
+            savedAddress = addressRepository.save(address);
+        }
+
+        Client client = new Client();
+        client.setName(name);
+        if (savedAddress != null) {
+            client.setAddressId(savedAddress.getId());
+        }
+        Client savedClient = clientRepository.save(client);
+
+        if (phoneNumbers != null && !phoneNumbers.isEmpty()) {
+            for (String number : phoneNumbers) {
+                if (number != null && !number.trim().isEmpty()) {
+                    Phone phone = new Phone();
+                    phone.setNumber(number);
+                    phone.setClientId(savedClient.getId());
+                    savedClient.addPhone(phone);
+                }
+            }
+            savedClient = clientRepository.save(savedClient);
+        }
+
+        if (savedAddress != null) {
+            savedClient.setAddress(savedAddress);
+        }
+
+        return savedClient;
     }
 
     @Override
@@ -90,5 +140,4 @@ public class ClientServiceImpl implements ClientService {
 
         return saveClient;
     }
-
 }

@@ -1,4 +1,4 @@
-package ru.otus.springboot.crm.model;
+package ru.otus.springboot.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
