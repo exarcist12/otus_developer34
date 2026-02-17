@@ -22,3 +22,5 @@ pluginManagement {
     }
 }
 include("hw-jpql21")
+include("hw-webservice24")
+include("hw-springDataJdbc28")
