@@ -22,3 +22,4 @@ pluginManagement {
     }
 }
 include("hw-jpql21")
+include("hw-executors31")
