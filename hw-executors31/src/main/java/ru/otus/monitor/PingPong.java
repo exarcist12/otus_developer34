@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 public class PingPong {
     private static final Logger logger = LoggerFactory.getLogger(PingPong.class);
 
-    private int pred = 0;
     private int last = 1;
     int direction = 1;
     int min = 1;
@@ -32,16 +31,11 @@ public class PingPong {
                 logger.info(String.valueOf(last));
                 sleep();
                 currentTread = (currentTread == 1) ? 2 : 1;
-                if (numberThread == currentTread) {
-                    logger.info(String.valueOf(last));
-                }
                 sleep();
                 notifyAll();
                 logger.info("after notify");
 
-                if (increasePred) {
-                    pred = pred + direction;
-                } else {
+                if (!increasePred) {
                     last = last + direction;
                 }
                 increasePred = !increasePred;
