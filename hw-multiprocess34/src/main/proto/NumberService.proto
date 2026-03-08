@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package ru.otus.numbers;
+
+option java_multiple_files = true;
+
+message RangeRequest {
+  int32 firstValue = 1;
+  int32 lastValue = 2;
+}
+
+message NumberResponse {
+  int32 value = 1;
+}
+
+service NumbersService {
+  rpc generateNumbers(RangeRequest) returns (stream NumberResponse);
+}
