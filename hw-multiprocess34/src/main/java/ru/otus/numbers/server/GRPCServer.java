@@ -24,7 +24,6 @@ public class GRPCServer {
         server.awaitTermination();
     }
 
-
     static class NumbersServiceImpl extends NumbersServiceGrpc.NumbersServiceImplBase {
 
         @Override
