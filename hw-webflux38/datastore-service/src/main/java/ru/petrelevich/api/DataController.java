@@ -44,11 +44,21 @@ public class DataController {
 
     @GetMapping(value = "/msg/{roomId}", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<MessageDto> getMessagesByRoomId(@PathVariable("roomId") String roomId) {
-        return Mono.just(roomId)
-                .doOnNext(room -> log.info("getMessagesByRoomId, room:{}", room))
-                .flatMapMany(dataStore::loadMessages)
-                .map(message -> new MessageDto(message.msgText()))
-                .doOnNext(msgDto -> log.info("msgDto:{}", msgDto))
-                .subscribeOn(workerPool);
+
+        if (roomId.equals("1408")) {
+            return dataStore
+                    .loadAllMessages()
+                    .map(message -> new MessageDto(message.msgText() + " (from room " + message.roomId() + ")"))
+                    .doOnNext(msgDto -> log.info("messageWithRoomDto:{}", msgDto))
+                    .subscribeOn(workerPool);
+        } else {
+
+            return Mono.just(roomId)
+                    .doOnNext(room -> log.info("getMessagesByRoomId, room:{}", room))
+                    .flatMapMany(dataStore::loadMessages)
+                    .map(message -> new MessageDto(message.msgText()))
+                    .doOnNext(msgDto -> log.info("msgDto:{}", msgDto))
+                    .subscribeOn(workerPool);
+        }
     }
 }
