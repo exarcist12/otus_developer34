@@ -17,6 +17,7 @@ dependencies {
     implementation("com.google.protobuf:protobuf-java:$grpcProtobuf")
     implementation("com.google.errorprone:error_prone_annotations:$errorProneAnnotations")
     implementation("org.apache.tomcat:annotations-api:$tomcatAnnotationsApi")
+    implementation("ch.qos.logback:logback-classic")
 }
 
 val protoSrcDir = "$projectDir/build/generated/sources/proto"

@@ -3,6 +3,8 @@ package ru.otus.numbers.client;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import java.util.concurrent.CountDownLatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.otus.numbers.NumberResponse;
 import ru.otus.numbers.NumbersServiceGrpc;
 import ru.otus.numbers.RangeRequest;
@@ -16,8 +18,11 @@ public class GRPCClient {
 
     private static boolean isUser = false;
 
+    private static final Logger logger = LoggerFactory.getLogger(GRPCClient.class);
+    private static final Object lock = new Object();
+
     public static void main(String[] args) {
-        System.out.println("Client starts...");
+        logger.info("Client starts...");
 
         var channel = ManagedChannelBuilder.forAddress(SERVER_HOST, SERVER_PORT)
                 .usePlaintext()
@@ -29,44 +34,49 @@ public class GRPCClient {
             RangeRequest request =
                     RangeRequest.newBuilder().setFirstValue(1).setLastValue(30).build();
 
-            System.out.println("Sending request: numbers from 1 to 10");
+            logger.info("Sending request: numbers from 1 to 10");
 
             var latch = new CountDownLatch(1);
             stub.generateNumbers(request, new StreamObserver<NumberResponse>() {
                 @Override
                 public void onNext(NumberResponse response) {
-                    lastValueFromServer = response.getValue();
-                    System.out.println("Numbers from server: " + lastValueFromServer);
-                    isUser = false;
+                    synchronized (lock) {
+                        lastValueFromServer = response.getValue();
+                        logger.info("Numbers from server: " + lastValueFromServer);
+                        isUser = false;
+                    }
                 }
 
                 @Override
                 public void onError(Throwable t) {
-                    System.err.println("Error: " + t.getMessage());
+                    latch.countDown();
+                    logger.error("Error: " + t.getMessage());
                 }
 
                 @Override
                 public void onCompleted() {
-                    System.out.println("Finished!");
+                    logger.info("Finished!");
                     latch.countDown();
                 }
             });
 
-            System.out.println("Start getting numbers from server...");
+            logger.info("Start getting numbers from server...");
 
             for (int i = 0; i < 50; i++) {
                 Thread.sleep(1000);
-                currentValue = currentValue + 1;
-                if (!isUser) {
-                    currentValue = currentValue + lastValueFromServer;
-                    isUser = true;
+                synchronized (lock) {
+                    currentValue = currentValue + 1;
+                    if (!isUser) {
+                        currentValue = currentValue + lastValueFromServer;
+                        isUser = true;
+                    }
                 }
-                System.out.println("currentValue: " + currentValue);
+                logger.info("currentValue: " + currentValue);
             }
 
             latch.await();
 
-            System.out.println("All numbers received!");
+            logger.info("All numbers received!");
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
