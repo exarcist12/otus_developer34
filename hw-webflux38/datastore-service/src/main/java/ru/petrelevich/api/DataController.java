@@ -29,16 +29,21 @@ public class DataController {
     @PostMapping(value = "/msg/{roomId}")
     public Mono<Long> messageFromChat(@PathVariable("roomId") String roomId, @RequestBody MessageDto messageDto) {
         var messageStr = messageDto.messageStr();
+        Mono<Long> msgId = null;
 
-        var msgId = Mono.just(new Message(null, roomId, messageStr))
-                .doOnNext(msg -> log.info("messageFromChat:{}", msg))
-                .flatMap(dataStore::saveMessage)
-                .publishOn(workerPool)
-                .doOnNext(msgSaved -> log.info("msgSaved id:{}", msgSaved.id()))
-                .map(Message::id)
-                .subscribeOn(workerPool);
+        if (roomId.equals("1408")) {
+            log.error("messageFromChat, roomId:{}, msg:{} error", roomId, messageStr);
+        } else {
+            msgId = Mono.just(new Message(null, roomId, messageStr))
+                    .doOnNext(msg -> log.info("messageFromChat:{}", msg))
+                    .flatMap(dataStore::saveMessage)
+                    .publishOn(workerPool)
+                    .doOnNext(msgSaved -> log.info("msgSaved id:{}", msgSaved.id()))
+                    .map(Message::id)
+                    .subscribeOn(workerPool);
 
-        log.info("messageFromChat, roomId:{}, msg:{} done", roomId, messageStr);
+            log.info("messageFromChat, roomId:{}, msg:{} done", roomId, messageStr);
+        }
         return msgId;
     }
 
