@@ -22,6 +22,7 @@ public class MessageController {
     private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
     private static final String TOPIC_TEMPLATE = "/topic/response.";
+    private static final String ALL_TOPIC = "/topic/all";
 
     private final WebClient datastoreClient;
     private final SimpMessagingTemplate template;
@@ -33,11 +34,21 @@ public class MessageController {
 
     @MessageMapping("/message.{roomId}")
     public void getMessage(@DestinationVariable("roomId") String roomId, Message message) {
+
         logger.info("get message:{}, roomId:{}", message, roomId);
+
+        if ("1408".equals(roomId)) {
+            logger.warn("Room 1408 is read-only, rejecting message");
+            return;
+        }
+
         saveMessage(roomId, message).subscribe(msgId -> logger.info("message send id:{}", msgId));
 
         template.convertAndSend(
                 String.format("%s%s", TOPIC_TEMPLATE, roomId), new Message(HtmlUtils.htmlEscape(message.messageStr())));
+
+        String allMessage = String.format("%s (from room %s)", HtmlUtils.htmlEscape(message.messageStr()), roomId);
+        template.convertAndSend(ALL_TOPIC, new Message(allMessage));
     }
 
     @EventListener
@@ -75,6 +86,7 @@ public class MessageController {
     }
 
     private Mono<Long> saveMessage(String roomId, Message message) {
+
         return datastoreClient
                 .post()
                 .uri(String.format("/msg/%s", roomId))
@@ -84,9 +96,17 @@ public class MessageController {
     }
 
     private Flux<Message> getMessagesByRoomId(long roomId) {
+
+        String url;
+        if (roomId == 1408) {
+            url = "/msg/all";
+        } else {
+            url = String.format("/msg/%s", roomId);
+        }
+
         return datastoreClient
                 .get()
-                .uri(String.format("/msg/%s", roomId))
+                .uri(url)
                 .accept(MediaType.APPLICATION_NDJSON)
                 .exchangeToFlux(response -> {
                     if (response.statusCode().equals(HttpStatus.OK)) {

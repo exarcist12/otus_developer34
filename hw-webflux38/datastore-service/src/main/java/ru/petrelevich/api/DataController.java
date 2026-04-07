@@ -29,41 +29,37 @@ public class DataController {
     @PostMapping(value = "/msg/{roomId}")
     public Mono<Long> messageFromChat(@PathVariable("roomId") String roomId, @RequestBody MessageDto messageDto) {
         var messageStr = messageDto.messageStr();
-        Mono<Long> msgId = null;
+        Mono<Long> msgId = Mono.just(new Message(null, roomId, messageStr))
+                .doOnNext(msg -> log.info("messageFromChat:{}", msg))
+                .flatMap(dataStore::saveMessage)
+                .publishOn(workerPool)
+                .doOnNext(msgSaved -> log.info("msgSaved id:{}", msgSaved.id()))
+                .map(Message::id)
+                .subscribeOn(workerPool);
 
-        if (roomId.equals("1408")) {
-            log.error("messageFromChat, roomId:{}, msg:{} error", roomId, messageStr);
-        } else {
-            msgId = Mono.just(new Message(null, roomId, messageStr))
-                    .doOnNext(msg -> log.info("messageFromChat:{}", msg))
-                    .flatMap(dataStore::saveMessage)
-                    .publishOn(workerPool)
-                    .doOnNext(msgSaved -> log.info("msgSaved id:{}", msgSaved.id()))
-                    .map(Message::id)
-                    .subscribeOn(workerPool);
+        log.info("messageFromChat, roomId:{}, msg:{} done", roomId, messageStr);
 
-            log.info("messageFromChat, roomId:{}, msg:{} done", roomId, messageStr);
-        }
         return msgId;
     }
 
     @GetMapping(value = "/msg/{roomId}", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<MessageDto> getMessagesByRoomId(@PathVariable("roomId") String roomId) {
 
-        if (roomId.equals("1408")) {
-            return dataStore
-                    .loadAllMessages()
-                    .map(message -> new MessageDto(message.msgText() + " (from room " + message.roomId() + ")"))
-                    .doOnNext(msgDto -> log.info("messageWithRoomDto:{}", msgDto))
-                    .subscribeOn(workerPool);
-        } else {
+        return Mono.just(roomId)
+                .doOnNext(room -> log.info("getMessagesByRoomId, room:{}", room))
+                .flatMapMany(dataStore::loadMessages)
+                .map(message -> new MessageDto(message.msgText()))
+                .doOnNext(msgDto -> log.info("msgDto:{}", msgDto))
+                .subscribeOn(workerPool);
+    }
 
-            return Mono.just(roomId)
-                    .doOnNext(room -> log.info("getMessagesByRoomId, room:{}", room))
-                    .flatMapMany(dataStore::loadMessages)
-                    .map(message -> new MessageDto(message.msgText()))
-                    .doOnNext(msgDto -> log.info("msgDto:{}", msgDto))
-                    .subscribeOn(workerPool);
-        }
+    @GetMapping(value = "/msg/all", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<MessageDto> getAllMessages() {
+        log.info("getAllMessages called");
+        return dataStore
+                .loadAllMessages()
+                .map(message -> new MessageDto(message.msgText() + " (from room " + message.roomId() + ")"))
+                .doOnNext(msgDto -> log.info("messageWithRoomDto:{}", msgDto))
+                .subscribeOn(workerPool);
     }
 }

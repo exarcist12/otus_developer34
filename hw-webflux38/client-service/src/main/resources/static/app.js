@@ -30,6 +30,7 @@ const connect = () => {
     const selectedRoomId = document.getElementById(roomIdElementId).value;
     currentRoomId = selectedRoomId;
 
+
     stompClient = Stomp.over(new SockJS('/gs-guide-websocket'));
     stompClient.connect({}, (frame) => {
         setConnected(true);
@@ -38,10 +39,20 @@ const connect = () => {
         console.log(`Connected to roomId: ${selectedRoomId} frame:${frame}`);
         const topicName = `/topic/response.${selectedRoomId}`;
         const topicNameUser = `/user/${userName}${topicName}`;
-        if (stompClient.subscriptions) {
-            // В STOMP.js нет прямого способа отписаться, но мы можем сохранять ссылки
-            console.log("Previous subscriptions will be overwritten");
+        stompClient.subscribe("/user/queue/errors", (error) => {
+            console.error("Error from server:", error.body);
+            alert("Error: " + error.body);
+        });
+
+        if (roomId === "1408") {
+            stompClient.subscribe("/topic/all", (message) => {
+                const msg = JSON.parse(message.body).messageStr;
+                console.log("Received from /topic/all:", msg);  // для отладки
+                showMessage(msg);
+            });
+            console.log("✅ Subscribed to /topic/all for room 1408");
         }
+
         stompClient.subscribe(topicName, (message) => showMessage(JSON.parse(message.body).messageStr));
         stompClient.subscribe(topicNameUser, (message) => showMessage(JSON.parse(message.body).messageStr));
     });
