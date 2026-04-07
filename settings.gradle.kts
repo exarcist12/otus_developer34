@@ -22,3 +22,8 @@ pluginManagement {
     }
 }
 include("hw-jpql21")
+include("hw-webflux38")
+include("hw-webflux38:client-service")
+findProject(":hw-webflux38:client-service")?.name = "client-service"
+include("hw-webflux38:datastore-service")
+findProject(":hw-webflux38:datastore-service")?.name = "datastore-service"
